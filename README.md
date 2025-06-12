@@ -32,3 +32,8 @@ source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
+
+### Ejecutar Test
+- Interfaz web: http://localhost:8000
+
+- Swagger API: http://localhost:8000/docs

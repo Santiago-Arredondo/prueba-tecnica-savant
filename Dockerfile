@@ -3,6 +3,8 @@ FROM python:3.10-slim
 # Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
+    tesseract-ocr-spa \
+    tesseract-ocr-eng \
     poppler-utils \
     libglib2.0-0 \
     libsm6 \
