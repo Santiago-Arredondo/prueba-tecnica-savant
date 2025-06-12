@@ -1,10 +1,9 @@
-# app/web.py
-from fastapi import APIRouter, Request, UploadFile, Form
+from fastapi import APIRouter, Request, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from app.services.ocr import extract_text_from_file
+from app.services.ocr import extract_text_from_image, extract_text_from_pdf
 from app.services.llm import summarize_text, extract_entities
-from app.utils.file_handler import save_document_info, get_all_documents
+from app.utils.file_handler import save_document, get_all_documents
 from datetime import datetime
 
 router = APIRouter()
@@ -17,7 +16,20 @@ def home(request: Request):
 
 @router.post("/upload-file")
 async def upload_web(request: Request, file: UploadFile):
-    text = await extract_text_from_file(file)
+    content = await file.read()
+    ext = file.filename.lower()
+
+    if ext.endswith(".pdf"):
+        text = extract_text_from_pdf(content)
+    elif ext.endswith((".jpg", ".jpeg", ".png")):
+        text = extract_text_from_image(content)
+    else:
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "documents": get_all_documents(),
+            "error": "Formato no soportado"
+        })
+
     summary = summarize_text(text)
     entities = extract_entities(text)
 

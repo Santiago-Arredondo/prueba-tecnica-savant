@@ -1,5 +1,3 @@
-# app/utils/api.py
-
 from fastapi import APIRouter, UploadFile, File, Request
 from fastapi.responses import RedirectResponse
 from datetime import datetime
@@ -19,28 +17,21 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @router.post("/upload-file")
 async def upload_file(file: UploadFile = File(...)):
-    # Guardar archivo subido en disco
-    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    with open(file_path, "wb") as f:
-        shutil.copyfileobj(file.file, f)
-
-    # Leer contenido del archivo
     content = await file.read()
-
-    # Procesamiento OCR según el tipo de archivo
+    
     ext = file.filename.lower()
     if ext.endswith(".pdf"):
+        if not content.strip():
+            return {"error": "El archivo PDF está vacío"}
         text = extract_text_from_pdf(content)
     elif ext.endswith((".jpg", ".jpeg", ".png")):
         text = extract_text_from_image(content)
     else:
         return {"error": "Formato no soportado"}
 
-    # Simular procesamiento con LLM
     summary = summarize_text(text)
     entities = extract_entities(text)
 
-    # Guardar en historial (JSON)
     doc_data = {
         "filename": file.filename,
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),

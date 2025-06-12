@@ -4,17 +4,15 @@ import pytesseract
 import io
 
 def extract_text_from_pdf(content: bytes) -> str:
-    """
-    Convierte cada página del PDF en imagen y aplica OCR para extraer texto.
-    """
-    images = convert_from_bytes(content)
-    text = "\n".join(pytesseract.image_to_string(img) for img in images)
-    return text
+    try:
+        images = convert_from_bytes(content)
+        return "\n".join(pytesseract.image_to_string(img) for img in images)
+    except Exception as e:
+        return f"OCR Error: {str(e)}"
 
 def extract_text_from_image(content: bytes) -> str:
-    """
-    Aplica OCR directamente a la imagen (JPG, PNG).
-    """
-    img = Image.open(io.BytesIO(content))
-    text = pytesseract.image_to_string(img)
-    return text
+    try:
+        img = Image.open(io.BytesIO(content))
+        return pytesseract.image_to_string(img)
+    except Exception as e:
+        return f"OCR Error: {str(e)}"
