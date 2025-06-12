@@ -8,7 +8,7 @@ Este documento resume cómo se puede reemplazar el componente simulado del model
 Actualmente, el archivo `llm.py` incluye dos funciones básicas que simulan el comportamiento de un modelo de lenguaje:
 
 - `summarize_text(text: str)` : genera un resumen de ejemplo.
-- `extract_entities(text: str)` → devuelve una lista ficticia de entidades.
+- `extract_entities(text: str)` : devuelve una lista ficticia de entidades.
 
 Estas funciones están pensadas para fines de prueba, pero en producción deberían reemplazarse por un modelo real, ya sea local o basado en API.
 
