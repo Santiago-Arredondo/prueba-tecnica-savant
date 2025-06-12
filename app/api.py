@@ -1,41 +1,46 @@
-from fastapi import APIRouter, File, UploadFile, Request, Form
+# app/utils/api.py
+
+from fastapi import APIRouter, UploadFile, File, Request
 from fastapi.responses import RedirectResponse
 from datetime import datetime
-import shutil
 import os
+import shutil
 
-from app.utils.file_handler import save_document
-from app.services.ocr import extract_text_from_file
+from app.services.ocr import extract_text_from_pdf, extract_text_from_image
 from app.services.llm import summarize_text, extract_entities
+from app.utils.file_handler import save_document
+from app.utils.file_handler import get_all_documents
+
 
 router = APIRouter()
 
-UPLOAD_FOLDER = "documents/"
+UPLOAD_FOLDER = "app/documents"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @router.post("/upload-file")
 async def upload_file(file: UploadFile = File(...)):
+    # Guardar archivo subido en disco
     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    with open(file_path, "wb") as f:
+        shutil.copyfileobj(file.file, f)
 
-    # Guardar archivo en disco
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    # Leer contenido del archivo
+    content = await file.read()
 
-    # Reabrir el archivo como UploadFile simulado (para extraer texto con OCR)
-    with open(file_path, "rb") as f:
-        class TempUploadFile:
-            filename = file.filename
-            async def read(self):
-                return f.read()
+    # Procesamiento OCR según el tipo de archivo
+    ext = file.filename.lower()
+    if ext.endswith(".pdf"):
+        text = extract_text_from_pdf(content)
+    elif ext.endswith((".jpg", ".jpeg", ".png")):
+        text = extract_text_from_image(content)
+    else:
+        return {"error": "Formato no soportado"}
 
-        temp_file = TempUploadFile()
-        text = await extract_text_from_file(temp_file)
-
-    # Procesamiento con "IA"
+    # Simular procesamiento con LLM
     summary = summarize_text(text)
     entities = extract_entities(text)
 
-    # Guardar en historial
+    # Guardar en historial (JSON)
     doc_data = {
         "filename": file.filename,
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -49,6 +54,8 @@ async def upload_file(file: UploadFile = File(...)):
 
 @router.get("/history")
 async def get_history(request: Request):
-    documents = save_document.get_all_documents()
+    documents = get_all_documents()
+    return {"history": documents}
+
 
 
