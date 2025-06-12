@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Request
+from fastapi import APIRouter, UploadFile, File, Request, Form
 from fastapi.responses import RedirectResponse
 from datetime import datetime
 import os
@@ -6,8 +6,9 @@ import shutil
 
 from app.services.ocr import extract_text_from_pdf, extract_text_from_image
 from app.services.llm import summarize_text, extract_entities
-from app.utils.file_handler import save_document
-from app.utils.file_handler import get_all_documents
+from app.utils.file_handler import save_document,get_all_documents
+from pydantic import BaseModel
+from typing import List
 
 
 router = APIRouter()
@@ -15,8 +16,19 @@ router = APIRouter()
 UPLOAD_FOLDER = "app/documents"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-@router.post("/upload-file")
-async def upload_file(file: UploadFile = File(...)):
+class DocumentData(BaseModel):
+    filename: str
+    timestamp: str
+    summary: str
+    entities: List[str]
+
+@router.post("/upload-file",
+               summary="Subir y procesar archivo",
+    description="Permite subir un archivo PDF o imagen (JPG/PNG), extraer el texto con OCR, generar un resumen y extraer entidades. El resultado se guarda en el historial."
+             )
+async def upload_file(file: UploadFile = File(...),
+             lang: str = Form(default="eng+spa", description="Idiomas para OCR, separados por '+', por ejemplo: 'eng+spa' para inglés y español")
+            ):  
     content = await file.read()
     
     ext = file.filename.lower()
@@ -43,7 +55,12 @@ async def upload_file(file: UploadFile = File(...)):
     return RedirectResponse("/", status_code=303)
 
 
-@router.get("/history")
+@router.get(
+    "/history",
+    response_model=List[DocumentData],
+    summary="Obtener historial",
+    description="Devuelve el historial de documentos procesados con resumen y entidades."
+)
 async def get_history(request: Request):
     documents = get_all_documents()
     return {"history": documents}
