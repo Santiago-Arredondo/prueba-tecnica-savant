@@ -1,15 +1,24 @@
 # Reto Técnico - Procesamiento de Documentos con IA
 
-API en Python con FastAPI que permite subir PDFs o imágenes, extraer texto con OCR, resumir contenido y extraer entidades clave.
+Este proyecto implementa una API en Python con FastAPI que permite:
 
-## Requisitos
+- Subir archivos PDF o imágenes (JPG, PNG)
+- Extraer texto mediante OCR (Tesseract)
+- Generar un resumen del contenido
+- Extraer entidades clave
+- Visualizar un historial de documentos procesados
 
-- Docker
-- Python 3.10 (si se ejecuta localmente)
+##  Tecnologías utilizadas
 
-## Cómo ejecutar
+-  Python 3.10
+-  FastAPI
+-  Simulación de modelo LLM (extensible a transformers u ollama)
+-  OCR con `pytesseract`
+-  Contenedorización con Docker
+-  Frontend sencillo con TailwindCSS
 
-### Con Docker
+
+### Ejecutar Con Docker
 ```bash
 docker build -t prueba_tecnica_savant .
 docker run -p 8000:8000 prueba_tecnica_savant

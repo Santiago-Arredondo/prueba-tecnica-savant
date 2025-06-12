@@ -1,28 +1,33 @@
 # Dockerfile
 FROM python:3.10-slim
 
-# Instalar dependencias del sistema para Tesseract, PDF y PIL
+# Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     poppler-utils \
-    libgl1 \
-    build-essential \
-    libpoppler-cpp-dev \
-    tesseract-ocr-spa \
+    libglib2.0-0 \
+    libsm6 \
+    libxrender1 \
+    libxext6 \
     && rm -rf /var/lib/apt/lists/*
 
-# Establecer el directorio de trabajo
+# Crear directorio de trabajo
 WORKDIR /app
 
-# Copiar requerimientos e instalarlos
+# Copiar dependencias
 COPY requirements.txt .
+
+# Instalar dependencias Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar todo el proyecto
+# Copiar el código del proyecto
 COPY . .
 
-# Exponer el puerto de FastAPI
+# Crear carpeta de documentos
+RUN mkdir -p documents
+
+# Puerto expuesto
 EXPOSE 8000
 
-# Comando para correr el servidor
+# Comando por defecto
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
