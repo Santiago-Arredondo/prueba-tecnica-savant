@@ -40,5 +40,5 @@ async def upload_web(request: Request, file: UploadFile):
         "timestamp": datetime.now().isoformat()
     }
 
-    save_document_info(doc)
+    save_document(doc)
     return RedirectResponse(url="/", status_code=303)
