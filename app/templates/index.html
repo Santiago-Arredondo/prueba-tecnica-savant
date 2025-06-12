@@ -5,12 +5,24 @@
   <title>Reto IA - Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function toggle(id) {
+      const el = document.getElementById(id);
+      el.classList.toggle('hidden');
+    }
+  </script>
 </head>
 <body class="bg-gray-100 text-gray-800 p-4">
   <div class="max-w-3xl mx-auto">
     <h1 class="text-3xl font-bold mb-6">Procesar Documentos</h1>
+
     <form action="/upload-file" method="post" enctype="multipart/form-data" class="mb-8 bg-white p-4 rounded shadow">
-      <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png" required class="mb-4">
+      <label class="block mb-2">Archivo (PDF o imagen):</label>
+      <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png" required class="mb-4 w-full">
+
+      <label class="block mb-2">Idioma OCR:</label>
+      <input type="text" name="lang" value="eng+spa" class="mb-4 w-full" placeholder="Ej: eng+spa">
+
       <button class="bg-blue-600 text-white px-4 py-2 rounded">Subir y Procesar</button>
     </form>
 
@@ -21,7 +33,13 @@
           <div class="text-sm text-gray-600">{{ doc.timestamp }} | {{ doc.filename }}</div>
           <div class="mt-2">
             <p><strong>Resumen:</strong> {{ doc.summary }}</p>
-            <p><strong>Entidades:</strong> {{ doc.entities | join(", ") }}</p>
+            <p class="mt-2">
+              <strong>Entidades:</strong>
+              <button onclick="toggle('entities-{{ loop.index }}')" class="ml-2 text-blue-600 underline">ver/ocultar</button>
+            </p>
+            <div id="entities-{{ loop.index }}" class="mt-2 hidden">
+              <pre class="bg-gray-100 p-2 rounded text-sm whitespace-pre-wrap">{{ doc.entities | tojson(indent=2) }}</pre>
+            </div>
           </div>
         </div>
       {% endfor %}

@@ -1,3 +1,4 @@
+# app/web.py
 from fastapi import APIRouter, Request, UploadFile, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -19,19 +20,24 @@ def home(request: Request):
     docs = get_all_documents()
     return templates.TemplateResponse("index.html", {"request": request, "documents": docs})
 
+
 @router.post(
     "/upload-file",
     summary="Subida desde interfaz web",
     description="Maneja la carga de archivos desde el formulario HTML, aplica OCR (PDF o imagen), y guarda los resultados."
 )
-async def upload_web(request: Request, file: UploadFile, lang: str = Form(default="eng+spa", description="Idiomas OCR, separados por '+'. Ej: 'eng+spa' para inglés y español")):
+async def upload_web(
+    request: Request,
+    file: UploadFile,
+    lang: str = Form(default="eng+spa", description="Idiomas OCR, separados por '+'. Ej: 'eng+spa' para inglés y español")
+):
     content = await file.read()
     ext = file.filename.lower()
 
     if ext.endswith(".pdf"):
-        text = extract_text_from_pdf(content)
+        text = extract_text_from_pdf(content, lang=lang)
     elif ext.endswith((".jpg", ".jpeg", ".png")):
-        text = extract_text_from_image(content)
+        text = extract_text_from_image(content, lang=lang)
     else:
         return templates.TemplateResponse("index.html", {
             "request": request,

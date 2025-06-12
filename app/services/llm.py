@@ -6,7 +6,7 @@ def summarize_text(text: str) -> str:
         "Resume el siguiente documento en 2 o 3 líneas, manteniendo los datos clave si se trata de una orden, factura o guía de carga.\n\n"
         f"{text}"
     )
-    response = requests.post("http://localhost:11434/api/generate", json={
+    response = requests.post("http://host.docker.internal:11434/api/generate",  json={
         "model": "mistral",
         "prompt": prompt,
         "stream": False

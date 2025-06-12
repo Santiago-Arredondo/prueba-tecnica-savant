@@ -5,4 +5,5 @@ pdf2image
 Pillow
 Jinja2
 python-multipart
+requests
 
