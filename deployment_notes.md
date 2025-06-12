@@ -1,62 +1,61 @@
 #  Deployment Notes – Producción de la API de Procesamiento de Documentos
 
-Este documento describe cómo sería el reemplazo del componente simulado de modelo de lenguaje (LLM) por una solución real en un entorno de producción. El objetivo es mejorar la capacidad de análisis semántico de los documentos mediante herramientas de IA avanzadas.
+Este documento resume cómo se puede reemplazar el componente simulado del modelo de lenguaje (llm.py) por una solución real en un entorno de producción. La idea es mejorar el análisis semántico de los documentos, usando herramientas más potentes para generar resúmenes y extraer entidades.
 
 
 ##  Componente a reemplazar
 
-Actualmente, el proyecto utiliza un archivo `llm.py` que simula dos funciones:
+Actualmente, el archivo `llm.py` incluye dos funciones básicas que simulan el comportamiento de un modelo de lenguaje:
 
-- `summarize_text(text: str)` → devuelve un resumen ficticio.
-- `extract_entities(text: str)` → devuelve una lista simulada de entidades.
+- `summarize_text(text: str)` : genera un resumen de ejemplo.
+- `extract_entities(text: str)` → devuelve una lista ficticia de entidades.
 
-En producción, este módulo debe ser reemplazado por un modelo real de lenguaje, que puede estar en la nube o ejecutarse de forma local.
+Estas funciones están pensadas para fines de prueba, pero en producción deberían reemplazarse por un modelo real, ya sea local o basado en API.
 
 
 ##  Opciones de reemplazo en producción
 
 ### Opción 1: OpenAI GPT-4 (via API)
 
-**Resumen:** Ideal para entornos cloud que requieran máxima precisión y calidad en el procesamiento de lenguaje natural.
+**Resumen:** Ideal si el proyecto se va a desplegar en la nube y se busca alta precisión en los resultados.
 
 **Ventajas:**
-- Alta calidad en resúmenes y detección de entidades.
-- Fácil integración con SDK oficial.
-- Ideal para productos con acceso a internet y presupuesto para uso por token.
+- Excelente calidad en los resúmenes y en la detección de entidades.
+- Integración rápida usando el SDK oficial o peticiones HTTP.
 
 **Consideraciones:**
-- Uso responsable del API: manejar errores, límites de cuota, y costes.
-- Las claves deben almacenarse en variables de entorno (no hardcoded).
+-Hay costos por token procesado, así que se debe controlar el uso.
+-Las claves API deben guardarse como variables de entorno, nunca en el código directamente.
 
 
 ###  Opción 2: Ollama (modelos locales como Mistral o LLaMA)
 
-**Resumen:** Solución completamente local, ideal para despliegues on-premise o cuando se requiere privacidad total de los datos.
+**Resumen:** Muy útil si se necesita correr todo localmente (on-premise) o si los datos no pueden salir de la red.
 
 **Ventajas:**
-- Gratuito y privado.
-- Fácil de probar y escalar.
-- Compatible con modelos como `llama2`, `mistral`, `gemma`.
+- Gratuito, no requiere conexión a Internet.
+- Compatible con varios modelos ligeros y eficientes.
 
 **Consideraciones:**
-- Ollama debe estar corriendo como servicio.
-- Posiblemente necesitarás ajustar la infraestructura para GPUs si se busca rendimiento.
+- Se necesita tener el servicio de Ollama corriendo.
+- Para mejorar tiempos de respuesta, puede requerir una máquina con GPU.
 
 
 ###  Opción 3: Hugging Face Transformers (local o cloud)
 
-**Resumen:** Para proyectos que requieran personalización de modelos o integración en pipelines ML.
+**Resumen:** Cuando se quiere más flexibilidad, personalización, o se planea integrar la solución a un pipeline de ML más amplio.
 
 **Ventajas:**
-- Gran variedad de modelos disponibles.
-- Uso local o con inferencia en la nube.
-- APIs de NER disponibles como `dslim/bert-base-NER`.
+- Amplia variedad de modelos disponibles.
+- Puedes usarlos localmente o vía transformers + pipeline.
+- Modelos preentrenados de NER como `bert-base-NER` listos para usar.
 
 **Consideraciones:**
-- Requiere buena RAM y/o GPU para modelos grandes.
-- Puedes cachear modelos para rendimiento óptimo.
+- Algunos modelos son pesados, por lo que se recomienda contar con suficiente RAM o GPU.
+- El tiempo de carga inicial puede ser mayor, aunque luego mejora con caché.
 
 
 ##  Conclusión
 
-Este sistema ha sido desarrollado de forma modular para facilitar su evolución. El uso de un simulador permitió validar la arquitectura general, mientras que en producción, es recomendable reemplazar el backend LLM por soluciones reales como OpenAI, Ollama o modelos de HuggingFace según las necesidades específicas de privacidad, rendimiento y coste.
+El proyecto fue diseñado para ser fácilmente adaptable a diferentes entornos. El uso de funciones simuladas permitió enfocarse en la arquitectura general y dejar lista la estructura para incorporar un modelo de lenguaje real cuando sea necesario.
+Cualquiera de las opciones mencionadas puede integrarse sin cambiar gran parte del código, ya que las funciones clave (summarize_text y extract_entities) están aisladas. La elección final dependerá de las necesidades del entorno de despliegue: disponibilidad de internet, presupuesto, privacidad y capacidad de cómputo.
