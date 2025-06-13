@@ -1,4 +1,3 @@
-# app/web.py
 from fastapi import APIRouter, Request, UploadFile, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
