@@ -43,3 +43,7 @@ pip install -r requirements.txt
 - docker build -t prueba_tecnica_savant .
 - docker run -p 8000:8000 prueba_tecnica_savant
 Con Docker, es importante asegurarse de tener Docker Desktop abierto antes de ejecutar el contenedor.
+
+- Interfaz web: http://localhost:8000
+
+- Swagger API: http://localhost:8000/docs
