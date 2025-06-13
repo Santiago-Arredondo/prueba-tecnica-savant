@@ -29,9 +29,9 @@
         <div class="bg-white p-4 rounded shadow">
           <div class="text-sm text-gray-600">{{ doc.timestamp }} | {{ doc.filename }}</div>
           <div class="mt-2">
-            <p><strong>Resumen:</strong> {{ doc.summary }}</p>
+            <p><strong>Summary:</strong> {{ doc.summary }}</p>
             <p class="mt-2">
-              <strong>Entidades:</strong>
+              <strong>Entities:</strong>
               <button onclick="toggle('entities-{{ loop.index }}')" class="ml-2 text-blue-600 underline">ver/ocultar</button>
             </p>
             <div id="entities-{{ loop.index }}" class="mt-2 hidden">

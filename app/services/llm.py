@@ -15,26 +15,27 @@ def summarize_text(text: str) -> str:
 
 def extract_entities(text: str) -> dict:
     prompt = (
-        "A partir del siguiente texto extraído de un documento logístico o comercial, extrae las entidades clave y devuélvelas en formato JSON estructurado.\n"
-        "Identifica campos como Carrier, Phone, Email, Stops, PO#, Date/time, etc., y agrúpalos de forma que se entiendan.\n"
-        "Ejemplo de formato:\n"
+        "Analiza el siguiente texto proveniente de un documento logístico (como guía, factura o confirmación de carga). "
+        "Extrae las entidades clave en formato JSON válido y estructurado. "
+        "Incluye campos como: Carrier, Phone, Email, Stops, PO#, Date/time, Company, etc. "
+        "Estructura los datos en forma anidada si es necesario.\n\n"
+        "IMPORTANTE: Devuelve ÚNICAMENTE un objeto JSON válido. No agregues explicaciones ni etiquetas antes o después.\n"
+        "Ejemplo de formato esperado:\n"
         "{\n"
-        "  \"Carrier\": \"...\",\n"
-        "  \"Phone\": \"...\",\n"
-        "  \"Email\": \"...\",\n"
+        "  \"Carrier\": \"V TRUCKING\",\n"
+        "  \"Phone\": \"346 373-0773\",\n"
+        "  \"Email\": \"vtruckinghouston@gmail.com\",\n"
         "  \"Stops\": {\n"
         "    \"Stop 1\": {\n"
         "      \"Stop type\": \"Pick\",\n"
-        "      \"Company\": \"...\",\n"
-        "      \"Date/time\": \"...\",\n"
-        "      \"Services\": \"...\",\n"
-        "      \"Stop Notes\": \"...\",\n"
-        "      \"PO#\": \"...\"\n"
+        "      \"Company\": \"Continental Poly 455 Julie Rivers Drive, Sugar Land, TX\",\n"
+        "      \"Date/time\": \"12-22-20; 10:00 AM - 4:00 PM CST\",\n"
+        "      \"PO#\": \"PO#4608482717\"\n"
         "    }\n"
         "  }\n"
-        "}\n"
-        "\nTexto:\n"
-        f"{text}\n\nDevuelve solo el JSON."
+        "}\n\n"
+        f"Texto:\n{text}\n\n"
+        "Recuerda: devuelve solo un JSON limpio que pueda ser parseado directamente."
     )
 
     response = requests.post("http://host.docker.internal:11434/api/generate", json={
@@ -44,6 +45,8 @@ def extract_entities(text: str) -> dict:
     })
 
     raw = response.json().get("response", "")
+    print("Respuesta de Ollama:\n", raw)
+
     try:
         return json.loads(raw)
     except Exception:
