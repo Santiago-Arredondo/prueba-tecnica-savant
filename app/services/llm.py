@@ -31,11 +31,11 @@ def extract_entities(text: str) -> dict:
     emails = list(set(find_all(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", text)))
     email_result = " / ".join(sorted(set(email.lower() for email in emails)))
 
-    # Teléfonos
+    
     phones = find_all(r"\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}", text)
     phone_result = phones[0] if phones else ""
 
-    # Carrier
+    
     carrier_raw = find(r"Carrier[:\s]*([^\n\r]+)", text)
     if "confirmation" in carrier_raw.lower():
         carrier = re.sub(r"(rate\s+confirmation\s*)", "", carrier_raw, flags=re.IGNORECASE).strip()
@@ -43,9 +43,9 @@ def extract_entities(text: str) -> dict:
         carrier = carrier_raw or "Desconocido"
 
     # PO#
-    po = find(r"\bPO[:#\-\s]*([A-Z0-9\-]{3,})\b", text)
+    po = find(r"\bPO(?:\s*Box)?[:#\-\s]*([A-Z0-9\-]{3,})\b", text)
 
-    # Paradas - más flexibles
+
     pickup_company = find(r"Shipper\s*[:\-]*\s*(.*)", text)
     drop_company = find(r"Consignee\s*[:\-]*\s*(.*)", text)
 
